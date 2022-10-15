@@ -2,10 +2,22 @@
 
 # Workshop: Jump Start React Native Development
 
-## Session 1
+Project with a basic navigation.
 
-Project with some basic navigation.
+## Setup
 
-## Session 2
+### Step 1: Configure Expo
 
-Project with custom dev client to use third party native libraries (MapBox)
+Install EXPO CLI:
+
+```shell
+npm install -g expo-cli
+```
+
+## Running the App
+
+### Start Expo
+
+```shell
+npm start
+```
