@@ -64,3 +64,9 @@ MAPBOX_TOKEN=YOUR_TOKEN
 ```shell
 npm start
 ```
+
+### Run Typescript check
+
+```shell
+npm run ts
+```
