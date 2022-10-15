@@ -2,7 +2,7 @@
 
 # Workshop: Jump Start React Native Development
 
-Project that shows the usage of EAS Build to build a custom dev client to use third party native libraries (MapBox).
+Project that shows Github automations and usage of EAS Build, EAS Update and EAS Submit.
 
 ## Setup
 
@@ -42,6 +42,9 @@ eas build --profile development --platform ios
 ```
 
 Wait for the build to be completed, and install it in your devices.
+
+
+##### Note. Once this is done in your local terminal, you can run the github workflow 
 
 
 ## Configuring the project

@@ -8,4 +8,8 @@ Project with some basic navigation.
 
 ## Session 2
 
-Project with custom dev client to use third party native libraries (MapBox)
+Project that shows the usage of EAS Build to build a custom dev client to use third party native libraries (MapBox).
+
+## Session 3
+
+Project that shows Github automations and usage of EAS Build, EAS Update and EAS Submit.
