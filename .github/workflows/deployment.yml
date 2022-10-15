@@ -38,7 +38,9 @@ jobs:
           npm ci
 
       - name: 🏗 Check Typescript
-        run: npm run ts
+        run: |
+          cd demo3-app/
+          npm run ts
         
   EAS-CHANNEL-PR:
     if: github.event_name == 'pull_request'
@@ -103,7 +105,9 @@ jobs:
       - name: 🚀 Expo - Publish to PR channel
         env:
           MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
-        run: eas update --branch "${{ github.event.pull_request.head.ref }}" --message ${{ env.COMMIT_MESSAGE }}
+        run: |
+          cd demo3-app/
+          eas update --branch "${{ github.event.pull_request.head.ref }}" --message ${{ env.COMMIT_MESSAGE }}
 
   EAS-CHANNEL-MAIN:
     if: github.ref == 'refs/heads/main'
@@ -155,7 +159,9 @@ jobs:
       - name: 🚀 Expo - Publish to default channel
         env:
           MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
-        run: eas update --auto
+        run: |
+          cd demo3-app/
+          eas update --auto
 
   EAS-Deploy-Stores:
     if: github.ref == 'refs/heads/main'
@@ -205,4 +211,6 @@ jobs:
           npm ci
 
       - name: 🚀 EAS - Deploys to AppStore
-        run: eas build --platform ios --auto-submit --non-interactive --no-wait
+        run: |
+          cd demo3-app/
+          eas build --platform ios --auto-submit --non-interactive --no-wait
