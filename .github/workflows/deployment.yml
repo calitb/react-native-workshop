@@ -164,8 +164,7 @@ jobs:
           eas update --auto
 
   EAS-Deploy-Stores:
-    if: github.ref == 'refs/heads/main'
-    needs: EAS-CHANNEL-MAIN
+    needs: Checks
     runs-on: ubuntu-latest
 
     steps:
