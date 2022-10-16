@@ -20,7 +20,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.calitb.demo2app"
+      "bundleIdentifier": "com.calitb.demo3app"
     },
     "android": {
       "adaptiveIcon": {

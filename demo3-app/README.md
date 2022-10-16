@@ -43,9 +43,7 @@ eas build --profile development --platform ios
 
 Wait for the build to be completed, and install it in your devices.
 
-
-##### Note. Once this is done in your local terminal, you can run the github workflow 
-
+##### Note. Once this is done in your local terminal, you can run the github workflow
 
 ## Configuring the project
 
@@ -69,4 +67,24 @@ npm start
 
 ```shell
 npm run ts
+```
+
+## Workflows
+
+```mermaid
+graph TD;
+    A[New Dependencies]-->|eas build --profile development| D[Dev Client Built];
+    B[New iOS Device]-->|eas device:create| C[Device Registered];
+    C-->|eas build --profile development| D;
+```
+
+```mermaid
+graph TD;
+    A[New Feature]-->|linter / typecheck / tests| B[Code Ready];
+    B-->|eas update --branch feature_brach| C[Feature in tester hands];
+    C-->|feedback| D[Code Changes];
+    D-->|eas update --branch feature_brach| C[Feature in tester hands];
+    C-->|approved| E[Approved Feature];
+    E-->|eas update --branch main| F[Code Ready to deploy]
+    F-->|eas build --auto-submit| G[Binary in Apple and Google servers]
 ```
