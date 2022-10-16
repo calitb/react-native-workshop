@@ -1,0 +1,216 @@
+name: Deployment
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  Checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v2
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+          cache-dependency-path: demo3-app/package-lock.json
+
+      - name: 📦 Find npm cache
+        id: npm-cache-dir
+        run: echo "::set-output name=dir::$(npm config get cache)"
+
+      - name: 📦 Restore cache
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: 📦 Install dependencies
+        run: |
+          cd demo3-app/
+          npm ci
+
+      - name: 🏗 Check Typescript
+        run: |
+          cd demo3-app/
+          npm run ts
+        
+  EAS-CHANNEL-PR:
+    if: github.event_name == 'pull_request'
+    needs: Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🏗 Check for EXPO_TOKEN
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
+            exit 1
+          fi
+
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v2
+        
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+          cache-dependency-path: demo3-app/package-lock.json
+
+      - name: 🏗 Setup Expo and EAS
+        uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Find npm cache
+        id: npm-cache-dir
+        run: echo "::set-output name=dir::$(npm config get cache)"
+
+      - name: 📦 Restore cache
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: 📦 Install dependencies
+        run: |
+          cd demo3-app/
+          npm ci
+
+      - name: Get PR Commits
+        id: 'get-pr-commits'
+        uses: tim-actions/get-pr-commits@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Number of commits
+        env:
+          commits: ${{steps.get-pr-commits.outputs.commits}}
+        run: |
+          MSG=$(echo $commits | jq '.[length-1].commit.message')
+          echo "COMMIT_MESSAGE=$MSG" >> $GITHUB_ENV
+
+      - name: 🚀 Expo - Publish to PR channel
+        env:
+          MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
+        run: |
+          cd demo3-app/
+          eas update --branch "${{ github.event.pull_request.head.ref }}" --message ${{ env.COMMIT_MESSAGE }}
+
+  EAS-CHANNEL-MAIN:
+    if: github.ref == 'refs/heads/main'
+    needs: Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🏗 Check for EXPO_TOKEN
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
+            exit 1
+          fi
+
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v2
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+          cache-dependency-path: demo3-app/package-lock.json
+
+      - name: 🏗 Setup Expo
+        uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Find npm cache
+        id: npm-cache-dir
+        run: echo "::set-output name=dir::$(npm config get cache)"
+
+      - name: 📦 Restore cache
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: 📦 Install dependencies
+        run: |
+          cd demo3-app/
+          npm ci
+
+      - name: 🚀 Expo - Publish to default channel
+        env:
+          MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
+        run: |
+          cd demo3-app/
+          eas update --auto
+
+  EAS-Deploy-Stores:
+    if: github.ref == 'refs/heads/main'
+    needs: EAS-CHANNEL-MAIN
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🏗 Check for EXPO_TOKEN
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
+            exit 1
+          fi
+
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v2
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+          cache-dependency-path: demo3-app/package-lock.json
+
+      - name: 🏗 Setup Expo and EAS
+        uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Find npm cache
+        id: npm-cache-dir
+        run: echo "::set-output name=dir::$(npm config get cache)"
+
+      - name: 📦 Restore cache
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: 📦 Install dependencies
+        run: |
+          cd demo3-app/
+          npm ci
+
+      - name: 🚀 EAS - Deploys to AppStore
+        run: |
+          cd demo3-app/
+          eas build --platform ios --auto-submit --non-interactive --no-wait

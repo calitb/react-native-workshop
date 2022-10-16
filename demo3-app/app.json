@@ -20,7 +20,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.calitb.demo2app"
+      "bundleIdentifier": "com.calitb.demo3app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show markers next to you.",
+      }
     },
     "android": {
       "adaptiveIcon": {

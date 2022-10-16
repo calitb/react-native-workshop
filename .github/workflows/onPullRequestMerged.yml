@@ -1,10 +1,13 @@
-name: BuildExpoDevCli
+name: PullRequestMerged
 
 on:
-  workflow_dispatch:
+  pull_request:
+    types: [closed]
 
 jobs:
-  EAS-Deploy-CustomDevCli:
+  PullRequestMerged:
+    if: github.event.pull_request.merged == true
+
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +28,7 @@ jobs:
           cache: npm
           cache-dependency-path: demo3-app/package-lock.json
 
-      - name: 🏗 Setup Expo and EAS
+      - name: 🏗 Setup Expo
         uses: expo/expo-github-action@v7
         with:
           expo-version: latest
@@ -49,7 +52,8 @@ jobs:
           cd demo3-app/
           npm ci
 
-      - name: 🚀 EAS - Deploys Custom Dev Client
+      - name: 🏗 Delete EAS Update channel and branch
         run: |
           cd demo3-app/
-          eas build --profile development --platform ios --non-interactive --no-wait
+          NAME="${{ github.event.pull_request.head.ref }}"
+          eas channel:delete "$NAME" --non-interactive  && eas branch:delete "$NAME" --json
