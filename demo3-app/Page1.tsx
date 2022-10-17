@@ -6,16 +6,15 @@ import {
   FlatList,
   Button,
   View,
-  TouchableOpacity,
 } from "react-native";
 import MapboxGL from "@rnmapbox/maps";
 import { HomeProps } from "./types/routes";
 
 export default function Page1(props: HomeProps): JSX.Element {
   const scheme = useColorScheme();
-  const [coords, setCoords] = React.useState([
-    { longitude: 7.523231, latitude: 7.523231 },
-  ]);
+  const [features, setFeatures] = React.useState<
+    GeoJSON.Feature<GeoJSON.Point>[]
+  >([]);
 
   return (
     <View
@@ -33,38 +32,29 @@ export default function Page1(props: HomeProps): JSX.Element {
             longitude: feature.geometry.coordinates[0],
             latitude: feature.geometry.coordinates[1],
           };
-          setCoords([...coords, coord]);
+          setFeatures([...features, feature]);
         }}
       >
-        {coords.map((coord, index) => (
-          <MapboxGL.PointAnnotation
-            key={`pointAnnotation${coord.longitude}${coord.latitude}`}
-            id={`pointAnnotation${coord.longitude}${coord.latitude}`}
-            coordinate={[coord.longitude, coord.latitude]}
+        {features.map((feature, index) => (
+          <MapboxGL.ShapeSource
+            key={`${feature.geometry.coordinates[0]}${feature.geometry.coordinates[1]}`}
+            id={`${feature.geometry.coordinates[0]}${feature.geometry.coordinates[1]}`}
+            shape={feature}
           >
-            <TouchableOpacity
-              onPress={() => {
-                setCoords(coords.filter((_, i) => i !== index));
+            <MapboxGL.CircleLayer
+              id={`${feature.geometry.coordinates[0]}${feature.geometry.coordinates[1]}`}
+              style={{
+                circleColor: "green",
+                circleRadius: 10,
               }}
-            >
-              <View
-                style={{
-                  height: 30,
-                  width: 30,
-                  backgroundColor: "#00cccc",
-                  borderRadius: 50,
-                  borderColor: "#fff",
-                  borderWidth: 3,
-                }}
-              />
-            </TouchableOpacity>
-          </MapboxGL.PointAnnotation>
+            ></MapboxGL.CircleLayer>
+          </MapboxGL.ShapeSource>
         ))}
       </MapboxGL.MapView>
       <FlatList
-        data={coords}
+        data={features}
         style={{ flex: 1 }}
-        renderItem={({ item: coord, index }) => (
+        renderItem={({ item: feature, index }) => (
           <View
             style={{
               padding: 10,
@@ -80,11 +70,13 @@ export default function Page1(props: HomeProps): JSX.Element {
                 scheme === "dark" ? { color: "#fff" } : { color: "#000" },
               ]}
             >
-              {`${coord.longitude.toFixed(6)}, ${coord.latitude.toFixed(6)}`}
+              {`${feature.geometry.coordinates[0].toFixed(
+                6
+              )}, ${feature.geometry.coordinates[1].toFixed(6)}`}
             </Text>
             <Button
               onPress={() => {
-                setCoords(coords.filter((_, i) => i !== index));
+                setFeatures(features.filter((_, i) => i !== index));
               }}
               title="Delete"
             />
