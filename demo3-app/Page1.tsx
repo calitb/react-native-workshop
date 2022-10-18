@@ -44,8 +44,8 @@ export default function Page1(props: HomeProps): JSX.Element {
             <MapboxGL.CircleLayer
               id={`${feature.geometry.coordinates[0]}${feature.geometry.coordinates[1]}`}
               style={{
-                circleColor: "green",
-                circleRadius: 10,
+                circleColor: "cyan",
+                circleRadius: 15,
               }}
             ></MapboxGL.CircleLayer>
           </MapboxGL.ShapeSource>
